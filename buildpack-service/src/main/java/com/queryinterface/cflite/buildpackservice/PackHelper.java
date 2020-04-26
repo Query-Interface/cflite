@@ -3,13 +3,13 @@ package com.queryinterface.cflite.buildpackservice;
 import io.minio.MinioClient;
 import io.minio.errors.MinioException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class PackHelper {
 
@@ -26,29 +26,71 @@ public class PackHelper {
 
     public void build(final PushCommand command) throws MinioException, NoSuchAlgorithmException, IOException, InvalidKeyException  {
         final String applicationId = command.getBlobStoreId();
-        final String applicationName = "test-app";
-        final MinioClient minioClient = new MinioClient(MINIO_URL, MINIO_ACCESS_KEY, MINIO_SECRET_KEY);
+        final MinioClient minioClient = new MinioClient(
+                getSystemProperty("MINIO_URL", MINIO_URL),
+                getSystemProperty("MINIO_ACCESS_KEY", MINIO_ACCESS_KEY),
+                getSystemProperty("MINIO_SECRET_KEY", MINIO_SECRET_KEY));
         if (minioClient.bucketExists(applicationId)) {
-            InputStream applicationCode = minioClient.getObject(applicationId, "code.zip");
-            // store in temporary folder //${java.io.tmpdir}
-            Path tempDirPath = Files.createTempDirectory(applicationId);
+            try (InputStream applicationCode = minioClient.getObject(applicationId, "code.zip")) {
+                // store in temporary folder
+                final Path tempDirPath = Files.createTempDirectory(applicationId);
+                final Path filePath = tempDirPath.resolve("code.zip");
+                Files.copy(applicationCode, filePath);
+                unzip(filePath, tempDirPath);
+                Files.delete(filePath);
 
+                ProcessBuilder processBuilder = new ProcessBuilder();
+                processBuilder.inheritIO();
+                processBuilder.command(PACK, "build", command.getApplicationName(), "--builder", "cnbs/sample-builder:bionic");
+                // set working as the dir containing our source code
+                 processBuilder.directory(tempDirPath.toFile());
+                // redirect output
+                //processBuilder.redirectOutput(tempDirPath.resolve("out.log").toFile());
+                try {
+                    Process process = processBuilder.start();
+                    process.getOutputStream();
+
+                    int exitCode = process.waitFor();
+                    // use completable future instead....
+                } catch (InterruptedException e) {
+                    e.printStackTrace(System.out);
+                }
+            } catch (Exception e) {
+                e.printStackTrace(System.out);
+            }
         }
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("/usr/bin/pack", "build", applicationName, "--builder", "cnbs/sample-builder:bionic");
-        // set working as the dir containing our source code
-        // processBuilder.directory(new File("..."))
-        // redirect output for streaming content ?
-        // processBuilder.redirectOutput(new File("..."));
-        try {
-            Process process = processBuilder.start();
-            process.getOutputStream();
+    }
 
-            int exitCode = process.waitFor();
-            // use completable future instead....
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    private String getSystemProperty(final String propertyName, final String defaultValue) {
+        final String value = System.getenv(propertyName);
+        if (value == null) {
+            return defaultValue;
         }
+        return value;
+    }
 
+    private void unzip(final Path zipFile, final Path outputDir) {
+        byte[] buffer = new byte[1024];
+        try (FileInputStream fileInput = new FileInputStream(zipFile.toFile());
+             ZipInputStream zipInput = new ZipInputStream(fileInput)) {
+            ZipEntry zEntry;
+            while ((zEntry = zipInput.getNextEntry()) != null) {
+                Path unzipToFile = outputDir.resolve(zEntry.getName()).normalize();
+                if (zEntry.isDirectory()) {
+                    Files.createDirectories(unzipToFile);
+                } else {
+                    try (FileOutputStream fileOutput = new FileOutputStream(unzipToFile.toFile())) {
+                        int size;
+                        while ((size = zipInput.read(buffer)) > 0) {
+                            fileOutput.write(buffer, 0, size);
+                        }
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace(System.out);
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
     }
 }

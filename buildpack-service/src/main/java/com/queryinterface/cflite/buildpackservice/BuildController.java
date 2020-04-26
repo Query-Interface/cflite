@@ -1,5 +1,6 @@
 package com.queryinterface.cflite.buildpackservice;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,9 +13,14 @@ public class BuildController
 {
 
     @RequestMapping(method = RequestMethod.POST, path="/build")
-    public ResponseEntity createImage(@RequestBody PushCommand pushCommand) {
-
-
+    public ResponseEntity<String> createImage(@RequestBody PushCommand pushCommand) {
+        PackHelper helper = new PackHelper();
+        try {
+            helper.build(pushCommand);
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
 
         return ResponseEntity.ok().build();
     }

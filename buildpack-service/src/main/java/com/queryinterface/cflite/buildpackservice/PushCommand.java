@@ -1,6 +1,8 @@
 package com.queryinterface.cflite.buildpackservice;
 
 public class PushCommand {
+    private String applicationName;
+    private String blobStoreId;
 
     public String getBlobStoreId() {
         return blobStoreId;
@@ -10,6 +12,11 @@ public class PushCommand {
         this.blobStoreId = blobStoreId;
     }
 
-    private String blobStoreId;
+    public String getApplicationName() {
+        return applicationName;
+    }
 
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
 }
