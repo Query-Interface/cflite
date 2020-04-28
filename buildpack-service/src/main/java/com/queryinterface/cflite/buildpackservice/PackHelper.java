@@ -41,7 +41,7 @@ public class PackHelper {
 
                 ProcessBuilder processBuilder = new ProcessBuilder();
                 processBuilder.inheritIO();
-                processBuilder.command(PACK, "build", command.getApplicationName(), "--builder", "cnbs/sample-builder:bionic");
+                processBuilder.command(PACK, "build", command.getApplicationName(), "--builder", "gcr.io/paketo-buildpacks/builder:base");
                 // set working as the dir containing our source code
                  processBuilder.directory(tempDirPath.toFile());
                 // redirect output
