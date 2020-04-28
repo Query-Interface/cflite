@@ -1,5 +1,6 @@
-package com.queryinterface.cflite.cloudcontroller.organizations;
+package com.queryinterface.cflite.cloudcontroller.spaces;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.queryinterface.cflite.cloudcontroller.common.InfoLink;
 import com.queryinterface.cflite.cloudcontroller.common.MetaData;
 import com.queryinterface.cflite.cloudcontroller.common.ToOneRelationShip;
@@ -11,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class Organization {
+public class Space {
     private UUID uuid;
     private String name;
     private boolean suspended = false;
@@ -20,17 +21,20 @@ public class Organization {
     private Map<String, InfoLink> links = new HashMap<>();
     private MetaData metadata = new MetaData();
     private Map<String, ToOneRelationShip> relationships = new HashMap<>();
+    @JsonIgnore
+    private UUID parentOrganization = UUID.randomUUID();
 
-    public Organization(final String name) {
+    public Space(final String name) {
         this.name = name;
         uuid = UUID.randomUUID();
         created_at = LocalDateTime.of(LocalDate.of(2020, 4, 27), LocalTime.of(12, 0));
         updated_at = LocalDateTime.of(LocalDate.of(2020, 4, 28), LocalTime.of(12, 0));
-        links.put("self", new InfoLink("http://localhost:8080/api/v3/organizations/"+uuid.toString()));
-        links.put("domains", new InfoLink("http://localhost:8080/api/v3/organizations/"+uuid.toString()+"/domains"));
-        links.put("default_domain", new InfoLink("http://localhost:8080/api/v3/organizations/"+uuid.toString()+"/domains/default"));
-        links.put("quota", new InfoLink("http://localhost:8080/api/v3/organization_quotas/"+uuid.toString()));
-        relationships.put("quota", new ToOneRelationShip(UUID.randomUUID().toString()));
+        links.put("self", new InfoLink("http://localhost:8080/api/v3/spaces/"+uuid.toString()));
+        links.put("features", new InfoLink("http://localhost:8080/api/v3/spaces/"+uuid.toString()+"/features"));
+        links.put("organization", new InfoLink("http://localhost:8080/api/v3/organizations/"+parentOrganization.toString()));
+        links.put("apply_manifest", new InfoLink("http://localhost:8080/api/v3/spaces/"+uuid.toString()+"/actions/apply_manifest"));
+                // TODO: add missing parameter method => see https://v3-apidocs.cloudfoundry.org/version/3.83.0/index.html#the-space-object
+        relationships.put("quota", new ToOneRelationShip(parentOrganization.toString()));
     }
 
     public UUID getUuid() {
