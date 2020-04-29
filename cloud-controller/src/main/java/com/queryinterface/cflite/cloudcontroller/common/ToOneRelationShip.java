@@ -9,4 +9,8 @@ public class ToOneRelationShip {
     public ToOneRelationShip(final String resourceId) {
         data.put("guid", resourceId);
     }
+
+    public Map<String, String> getData() {
+        return data;
+    }
 }
