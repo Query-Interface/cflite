@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Space {
-    private UUID uuid;
+    private UUID guid;
     private String name;
     private boolean suspended = false;
     private LocalDateTime created_at;
@@ -26,19 +26,19 @@ public class Space {
 
     public Space(final String name) {
         this.name = name;
-        uuid = UUID.randomUUID();
+        guid = UUID.randomUUID();
         created_at = LocalDateTime.of(LocalDate.of(2020, 4, 27), LocalTime.of(12, 0));
         updated_at = LocalDateTime.of(LocalDate.of(2020, 4, 28), LocalTime.of(12, 0));
-        links.put("self", new InfoLink("http://localhost:8080/api/v3/spaces/"+uuid.toString()));
-        links.put("features", new InfoLink("http://localhost:8080/api/v3/spaces/"+uuid.toString()+"/features"));
+        links.put("self", new InfoLink("http://localhost:8080/api/v3/spaces/"+ guid.toString()));
+        links.put("features", new InfoLink("http://localhost:8080/api/v3/spaces/"+ guid.toString()+"/features"));
         links.put("organization", new InfoLink("http://localhost:8080/api/v3/organizations/"+parentOrganization.toString()));
-        links.put("apply_manifest", new InfoLink("http://localhost:8080/api/v3/spaces/"+uuid.toString()+"/actions/apply_manifest"));
+        links.put("apply_manifest", new InfoLink("http://localhost:8080/api/v3/spaces/"+ guid.toString()+"/actions/apply_manifest"));
                 // TODO: add missing parameter method => see https://v3-apidocs.cloudfoundry.org/version/3.83.0/index.html#the-space-object
         relationships.put("quota", new ToOneRelationShip(parentOrganization.toString()));
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getGuid() {
+        return guid;
     }
 
     public String getName() {

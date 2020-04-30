@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Organization {
-    private UUID uuid;
+    private UUID guid;
     private String name;
     private boolean suspended = false;
     private LocalDateTime created_at;
@@ -23,18 +23,18 @@ public class Organization {
 
     public Organization(final String name) {
         this.name = name;
-        uuid = UUID.randomUUID();
+        guid = UUID.randomUUID();
         created_at = LocalDateTime.of(LocalDate.of(2020, 4, 27), LocalTime.of(12, 0));
         updated_at = LocalDateTime.of(LocalDate.of(2020, 4, 28), LocalTime.of(12, 0));
-        links.put("self", new InfoLink("http://localhost:8080/api/v3/organizations/"+uuid.toString()));
-        links.put("domains", new InfoLink("http://localhost:8080/api/v3/organizations/"+uuid.toString()+"/domains"));
-        links.put("default_domain", new InfoLink("http://localhost:8080/api/v3/organizations/"+uuid.toString()+"/domains/default"));
-        links.put("quota", new InfoLink("http://localhost:8080/api/v3/organization_quotas/"+uuid.toString()));
+        links.put("self", new InfoLink("http://localhost:8080/api/v3/organizations/"+ guid.toString()));
+        links.put("domains", new InfoLink("http://localhost:8080/api/v3/organizations/"+ guid.toString()+"/domains"));
+        links.put("default_domain", new InfoLink("http://localhost:8080/api/v3/organizations/"+ guid.toString()+"/domains/default"));
+        links.put("quota", new InfoLink("http://localhost:8080/api/v3/organization_quotas/"+ guid.toString()));
         relationships.put("quota", new ToOneRelationShip(UUID.randomUUID().toString()));
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getGuid() {
+        return guid;
     }
 
     public String getName() {

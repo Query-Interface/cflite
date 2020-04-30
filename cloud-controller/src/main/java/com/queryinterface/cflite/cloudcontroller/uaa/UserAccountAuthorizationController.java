@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,8 +26,14 @@ public class UserAccountAuthorizationController {
                     path = "/oauth/token",
                     consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity auth(BindingAwareModelMap authenticationParam) {
-        return ResponseEntity.ok(new OAuthToken());
+    public ResponseEntity auth(BindingAwareModelMap authenticationParam, HttpServletResponse response) {
+        Cookie cookie = new Cookie("JSESSIONID", "__aSessionId__");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(2 * 24 * 3600);
+
+        return ResponseEntity.ok().body(new OAuthToken());
     }
 
      /*
