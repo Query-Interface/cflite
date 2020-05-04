@@ -1,7 +1,6 @@
 package com.queryinterface.cflite.cloudcontroller.uaa;
 
 public class AuthParams {
-    // grant_type=password&password=test&username=test%40mail.com
     private String grant_type;
     private String username;
     private String password;

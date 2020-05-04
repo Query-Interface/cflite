@@ -1,14 +1,10 @@
 package com.queryinterface.cflite.cloudcontroller.uaa;
 
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.support.BindingAwareModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,20 +16,6 @@ public class UserAccountAuthorizationController {
     @RequestMapping(method = RequestMethod.GET, path = "/login")
     public ResponseEntity<UaaInformation> login() {
         return ResponseEntity.ok(new UaaInformation());
-    }
-
-    @RequestMapping(method = RequestMethod.POST,
-                    path = "/oauth/token",
-                    consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity auth(BindingAwareModelMap authenticationParam, HttpServletResponse response) {
-        Cookie cookie = new Cookie("JSESSIONID", "__aSessionId__");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(2 * 24 * 3600);
-
-        return ResponseEntity.ok().body(new OAuthToken());
     }
 
      /*
