@@ -31,8 +31,6 @@ Cli commands to support:
 - service: bind a service to an application
 
 ## Current development state and plans
-- REST APIs for UAA and Cloud Controller to retrieve to respond to CF cli commands: api, login, organizations, spaces (some with mocked repsonses)
+- REST APIs for UAA and Cloud Controller to respond to CF cli commands: api, login, organizations, spaces (some with mocked repsonses)
 - kpack will be used to compile code with buidpacks.io
 - minio will be used as blob storage
-- a private docker registry will be deployed in k8s to store images created by the buildpacks
-- ...
