@@ -42,8 +42,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain filterChain, Authentication authentication) {
-        var user = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal());
-        // TODO: store users in DB
+        var user = ((User) authentication.getPrincipal());
         // TODO: provide real authorities
         String scope = "uaa.user cloud_controller.read password.write cloud_controller.write";
 
@@ -57,8 +56,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .setSubject(user.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400*1000))  //24 hours
                 .claim("user_name", user.getUsername())
-                .claim("user_id", "1234")
-                .claim("origin", "http://localhost:8080/api")
+                .claim("user_id", user.getId().toString())
+                .claim("origin", user.getOrigin())
                 .claim("scope", Stream.of(scope.split(" ")).collect(Collectors.toList()))
                 .compact();
         AuthToken authToken = new AuthToken();

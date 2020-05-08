@@ -3,15 +3,16 @@ package com.queryinterface.cflite.cloudcontroller.common;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collection;
 import java.util.List;
 
 public class PaginatedResult<T> {
     private Pagination pagination;
-    private final List<T> resources;
+    private final Collection<T> resources;
     @JsonIgnore
     private final String resourceName;
 
-    public PaginatedResult(String resourceName, List<T> results) {
+    public PaginatedResult(String resourceName, Collection<T> results) {
         this.resourceName = resourceName;
         this.resources = results;
         this.pagination = new Pagination();
@@ -21,7 +22,7 @@ public class PaginatedResult<T> {
         return pagination;
     }
 
-    public List<T> getResources() {
+    public Collection<T> getResources() {
         return resources;
     }
 
