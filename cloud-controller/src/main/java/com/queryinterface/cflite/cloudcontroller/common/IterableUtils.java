@@ -10,4 +10,12 @@ public class IterableUtils {
         it.forEach(result::add);
         return result;
     }
+
+    public static <T> List<T> of(T... elems) {
+        List<T> result = new ArrayList<>();
+        for (int i = 0; i < elems.length; i++) {
+            result.add(elems[i]);
+        }
+        return result;
+    }
 }

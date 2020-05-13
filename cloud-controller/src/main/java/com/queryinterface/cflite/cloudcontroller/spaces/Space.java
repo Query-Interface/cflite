@@ -49,18 +49,22 @@ public class Space {
 
     public Space(final String name) {
         this.name = name;
-        id = UUID.randomUUID();
         created_at = LocalDateTime.of(LocalDate.of(2020, 4, 27), LocalTime.of(12, 0));
         updated_at = LocalDateTime.of(LocalDate.of(2020, 4, 28), LocalTime.of(12, 0));
-        links.put("self", new InfoLink("http://localhost:8080/api/v3/spaces/"+ id.toString()));
-        links.put("features", new InfoLink("http://localhost:8080/api/v3/spaces/"+ id.toString()+"/features"));
-        links.put("apply_manifest", new InfoLink("http://localhost:8080/api/v3/spaces/"+ id.toString()+"/actions/apply_manifest"));
+
         // TODO: add missing parameter method => see https://v3-apidocs.cloudfoundry.org/version/3.83.0/index.html#the-space-object
     }
 
     @JsonProperty("guid")
     public UUID getId() {
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+        links.put("self", new InfoLink("http://localhost:8080/api/v3/spaces/"+ id.toString()));
+        links.put("features", new InfoLink("http://localhost:8080/api/v3/spaces/"+ id.toString()+"/features"));
+        links.put("apply_manifest", new InfoLink("http://localhost:8080/api/v3/spaces/"+ id.toString()+"/actions/apply_manifest"));
     }
 
     public String getName() {
