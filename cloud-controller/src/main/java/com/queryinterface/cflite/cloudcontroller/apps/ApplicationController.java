@@ -5,6 +5,8 @@ import com.queryinterface.cflite.cloudcontroller.common.Resource;
 import com.queryinterface.cflite.cloudcontroller.jobs.Job;
 import com.queryinterface.cflite.cloudcontroller.jobs.JobDTO;
 import com.queryinterface.cflite.cloudcontroller.jobs.JobRepository;
+import com.queryinterface.cflite.cloudcontroller.processes.Process;
+import com.queryinterface.cflite.cloudcontroller.processes.ProcessRepository;
 import com.queryinterface.cflite.cloudcontroller.spaces.Space;
 import com.queryinterface.cflite.cloudcontroller.spaces.SpaceRepository;
 import io.minio.MinioClient;
@@ -38,26 +40,8 @@ public class ApplicationController {
     private SpaceRepository spaceRepository;
     @Autowired
     private JobRepository jobRepository;
-
-    @RequestMapping(method = RequestMethod.PUT, path = "/applications")
-    public ResponseEntity<String> pushTest(@RequestParam("file") MultipartFile file) {
-        final String applicationId = UUID.randomUUID().toString();
-        try {
-            final MinioClient minioClient = new MinioClient(MINIO_URL, MINIO_ACCESS_KEY, MINIO_SECRET_KEY);
-            minioClient.makeBucket(applicationId);
-            PutObjectOptions options = new PutObjectOptions(file.getSize(), 0L);
-            minioClient.putObject(applicationId, "code.zip", file.getInputStream(), options);
-        } catch (MinioException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        } catch (NoSuchAlgorithmException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        } catch (InvalidKeyException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-        return ResponseEntity.ok().body(applicationId);
-    }
+    @Autowired
+    private ProcessRepository processRepository;
 
     @RequestMapping(method = RequestMethod.GET, path = "/apps")
     public ResponseEntity<PaginatedResultV2> getApplication() {
@@ -75,7 +59,12 @@ public class ApplicationController {
             throw new RuntimeException("not found");
         }
         application.setSpace(optionalSpace.get());
-        Resource resource = Resource.of(applicationRepository.save(application));
+        application = applicationRepository.save(application);
+        Resource resource = Resource.of(application);
+
+        Process p = new Process("web");
+        p.setApplication(application);
+        processRepository.save(p);
         return ResponseEntity.status(HttpStatus.CREATED).body(resource);
     }
 
@@ -126,6 +115,6 @@ public class ApplicationController {
     @RequestMapping(method = RequestMethod.GET, path = "/apps/{guid}/routes")
     public ResponseEntity getRoutes(final @PathVariable String guid) {
         // TODO
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new PaginatedResultV2());
     }
 }
